@@ -161,24 +161,5 @@ anmalanForm.onsubmit = async (e)=>{
   }
 };
 </script>
-<script>
-function sendHeight() {
-  const height = document.documentElement.scrollHeight;
-  parent.postMessage({
-    type: "resize-iframe",
-    height: height
-  }, "https://www.karlskogabaptist.se");
-}
-
-window.addEventListener("load", sendHeight);
-window.addEventListener("resize", sendHeight);
-
-// kör efter att antal personer ändras
-const observer = new MutationObserver(sendHeight);
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
-</script>
 </body>
 </html>
