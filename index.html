@@ -22,7 +22,7 @@
   </select>
 
   <div id="namnfalt"></div>
-
+<p>
   <label>Boende:</label>
   <select id="boende" required>
     <option value="">Välj</option>
@@ -30,18 +30,22 @@
     <option>Husvagn</option>
     <option>Tält</option>
   </select>
-<br>
-  <label>E-post:</label>
-  <input type="email" id="email" required>
-<br>
-  <label>Telefonnummer:</label>
-  <input type="text" id="telefon" required>
-<br>
+  </p>
+
+  <p><label>E-post:</label>
+  <input type="email" id="email" required></p>
+  <p>
+    <label>Telefonnummer:</label>
+    <input type="text" id="telefon" required>
+  </p>
+<p>
   <label><input type="checkbox" id="skjuts" style="width:auto"> Jag/Vi behöver skjuts</label>
-<br>
+</p>
+<p>
   <label>Antal lediga platser i bilen:</label>
   <input type="number" id="platser" min="0" value="0">
-<br>
+  </p>
+<p>
   <label>Jag/Vi kan baka inför lägret:</label>
   <select id="baka">
     <option value="">Välj</option>
@@ -50,14 +54,16 @@
     <option>Båda</option>
     <option>Inget</option>
   </select>
-
+</p>
   <p><strong>Total kostnad: <span id="totalPris">0 kr</span></strong></p>
-
+<p>
   <label>Jag/Vi vill betala:</label>
   <input type="number" id="betalar" min="0" required>
-<br>
+  </p>
+<p>
   <label>Övrig information:</label>
   <textarea id="ovrigt"></textarea>
+  </p>
 
   <button type="submit">Anmäl</button>
 </form>
