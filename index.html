@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anmälan</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; padding: 10px; }
+    input, select, textarea, button { width: 100%; max-width: 400px; padding: 8px; margin-top: 4px; margin-bottom: 12px; }
+    .person { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    #msg { font-weight: bold; }
+  </style>
+</head>
+<body>
+<h1>Lägeranmälan</h1>
+<p id="msg"></p>
+
+<form id="anmalanForm">
+  <label>Antal personer:</label>
+  <select id="antal" required>
+    <option value="">Välj antal</option>
+  </select>
+
+  <div id="namnfalt"></div>
+
+  <label>Boende:</label>
+  <select id="boende" required>
+    <option value="">Välj</option>
+    <option>Rum</option>
+    <option>Husvagn</option>
+    <option>Tält</option>
+  </select>
+
+  <label>E-post:</label>
+  <input type="email" id="email" required>
+
+  <label>Telefonnummer:</label>
+  <input type="text" id="telefon" required>
+
+  <label><input type="checkbox" id="skjuts" style="width:auto"> Jag/Vi behöver skjuts</label>
+
+  <label>Antal lediga platser i bilen:</label>
+  <input type="number" id="platser" min="0" value="0">
+
+  <label>Jag/Vi kan baka inför lägret:</label>
+  <select id="baka">
+    <option value="">Välj</option>
+    <option>Matbröd</option>
+    <option>Fikabröd</option>
+    <option>Båda</option>
+    <option>Inget</option>
+  </select>
+
+  <p><strong>Total kostnad: <span id="totalPris">0 kr</span></strong></p>
+
+  <label>Jag/Vi vill betala:</label>
+  <input type="number" id="betalar" min="0" required>
+
+  <label>Övrig information:</label>
+  <textarea id="ovrigt"></textarea>
+
+  <button type="submit">Anmäl</button>
+</form>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8qTfvqA7JOc7DdqAHJdO2LirdlnSIvvuRWDOcA7nf_WYv_eLdDGT4r8dUaQXZPTik/exec";
+
+for (let i=1;i<=10;i++) {
+  antal.innerHTML += `<option value="${i}">${i}</option>`;
+}
+
+function sanitize(s){ return (s||"").replace(/;/g, ',').trim(); }
+
+function skapaNamnfalt() {
+  const n = parseInt(antal.value || 0);
+  namnfalt.innerHTML = '';
+  for (let i=1;i<=n;i++) {
+    namnfalt.innerHTML += `
+      <div class="person">
+        <strong>Person ${i}</strong><br>
+        <input type="text" name="namn" placeholder="Namn" required>
+        <input type="text" name="allergier" placeholder="Allergier">
+        <select name="alder" required>
+          <option value="">Välj ålder</option>
+          <option>Vuxen</option>
+          <option>Barn 0-5 år</option>
+          <option>Barn 6-14 år</option>
+        </select>
+      </div>`;
+  }
+  bindPriceEvents();
+  beraknaPris();
+}
+
+function bindPriceEvents(){
+  document.querySelectorAll('[name="alder"]').forEach(x=>x.onchange=beraknaPris);
+}
+
+function beraknaPris(){
+  const bo = boende.value;
+  const ages = [...document.querySelectorAll('[name="alder"]')].map(x=>x.value);
+  let vuxna = ages.filter(x=>x==='Vuxen').length;
+  let barn = ages.filter(x=>x==='Barn 6-14 år').length;
+  let pris = 0;
+  if (bo==='Rum') pris = vuxna*750 + barn*470;
+  if (bo==='Husvagn') pris = vuxna*500 + barn*250;
+  if (bo==='Tält') pris = vuxna*500 + barn*250;
+  totalPris.textContent = pris + ' kr';
+  if (!betalar.dataset.userChanged) betalar.value = pris;
+}
+
+antal.onchange = skapaNamnfalt;
+boende.onchange = beraknaPris;
+betalar.oninput = ()=> betalar.dataset.userChanged = '1';
+
+anmalanForm.onsubmit = async (e)=>{
+  e.preventDefault();
+
+  const personer = [...document.querySelectorAll('.person')].map(p => ({
+    namn: sanitize(p.querySelector('[name="namn"]').value),
+    allergier: sanitize(p.querySelector('[name="allergier"]').value),
+    alder: p.querySelector('[name="alder"]').value
+  }));
+
+  const data = {
+    token: "jjf889fhflä<fäfgnf w.!b",
+    personer,
+    boende: boende.value,
+    email: sanitize(email.value),
+    telefon: sanitize(telefon.value),
+    skjuts: skjuts.checked ? 'Ja' : 'Nej',
+    platser: parseInt(platser.value || 0),
+    baka: baka.value,
+    ovrigt: sanitize(ovrigt.value),
+    totalPris: parseInt(totalPris.textContent),
+    betalar: parseInt(betalar.value)
+  };
+
+  msg.textContent = 'Skickar...';
+
+  try {
+    const r = await fetch(SCRIPT_URL, {
+      method:'POST',
+      body: JSON.stringify(data)
+    });
+    const json = await r.json();
+    msg.style.color = 'green';
+    msg.textContent = '✅ ' + json.message;
+    anmalanForm.reset();
+    namnfalt.innerHTML='';
+    totalPris.textContent='0 kr';
+  } catch(err) {
+    msg.style.color = 'red';
+    msg.textContent = '❌ Fel vid skickning';
+  }
+};
+</script>
+</body>
+</html>
