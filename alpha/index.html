@@ -117,8 +117,16 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzccdKpEwuB9AuH4UrKYx6oLbZFRgNTSL4r6gkcMwneql0WgdvyjZqHY_WnWpDBqF4obA/exec";
 
+  let submitting = false;
 anmalanForm.onsubmit = async (e) => {
   e.preventDefault();
+
+  // Stoppa om en anmälan redan håller på att skickas
+  if (submitting) return;
+
+  submitting = true;
+
+  const button = document.getElementById("submitBtn");
 
   const data = {
     namn: namn.value.trim(),
@@ -127,11 +135,10 @@ anmalanForm.onsubmit = async (e) => {
     allergier: allergier.value.trim()
   };
 
-  const button = document.getElementById("submitBtn");
-
   button.disabled = true;
+  button.textContent = "Skickar...";
   msg.style.color = "black";
-  msg.textContent = "Skickar...";
+  msg.textContent = "Skickar din anmälan...";
 
   try {
     await fetch(SCRIPT_URL, {
@@ -148,8 +155,11 @@ anmalanForm.onsubmit = async (e) => {
   } catch (err) {
     msg.style.color = "red";
     msg.textContent = "❌ Fel vid skickning. Försök igen.";
+
   } finally {
+    submitting = false;
     button.disabled = false;
+    button.textContent = "Skicka anmälan";
   }
 };
 </script>
