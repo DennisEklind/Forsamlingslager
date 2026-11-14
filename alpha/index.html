@@ -7,28 +7,77 @@
   <title>Anmälan till Alpha-kursen</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 700px;
-      margin: 20px auto;
-      padding: 10px;
-    }
-
-    input, textarea, button {
-      width: 100%;
-      max-width: 400px;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 12px;
+    * {
       box-sizing: border-box;
     }
 
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 15px;
+      color: #333;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input,
     textarea {
-      min-height: 80px;
+      display: block;
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #bbb;
+      border-radius: 5px;
+      font-size: 16px;
+      font-family: Arial, sans-serif;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #3979b9;
+      box-shadow: 0 0 3px #3979b9;
+    }
+
+    button {
+      padding: 13px 25px;
+      background: #3979b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #28649e;
+    }
+
+    button:disabled {
+      background: #999;
+      cursor: wait;
     }
 
     #msg {
       font-weight: bold;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -41,23 +90,27 @@
 
 <form id="anmalanForm">
 
-  <label>Namn:<br>
+  <div class="form-group">
+    <label for="namn">Namn</label>
     <input type="text" id="namn" required>
-  </label>
+  </div>
 
-  <label>Telefon:<br>
+  <div class="form-group">
+    <label for="telefon">Telefon</label>
     <input type="tel" id="telefon" required>
-  </label>
+  </div>
 
-  <label>E-post:<br>
+  <div class="form-group">
+    <label for="email">E-post</label>
     <input type="email" id="email" required>
-  </label>
+  </div>
 
-  <label>Allergier/Specialkost:<br>
+  <div class="form-group">
+    <label for="allergier">Allergier/Specialkost</label>
     <textarea id="allergier"></textarea>
-  </label>
+  </div>
 
-  <button type="submit">Skicka anmälan</button>
+  <button type="submit" id="submitBtn">Skicka anmälan</button>
 
 </form>
 
@@ -74,6 +127,9 @@ anmalanForm.onsubmit = async (e) => {
     allergier: allergier.value.trim()
   };
 
+  const button = document.getElementById("submitBtn");
+
+  button.disabled = true;
   msg.style.color = "black";
   msg.textContent = "Skickar...";
 
@@ -92,6 +148,8 @@ anmalanForm.onsubmit = async (e) => {
   } catch (err) {
     msg.style.color = "red";
     msg.textContent = "❌ Fel vid skickning. Försök igen.";
+  } finally {
+    button.disabled = false;
   }
 };
 </script>
